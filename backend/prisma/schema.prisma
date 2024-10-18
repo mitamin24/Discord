@@ -1,0 +1,50 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String        @id @default(uuid())
+  email          String        @unique // Ensure email is unique
+  password       String 
+  profilePicture  String?
+  username       String        @unique
+  createdAt      DateTime      @default(now())
+  messages       Messages[]     // One-to-many relationship
+  channels       Channel[]      // One-to-many relationship
+  subscriptions   Subscriptions[] // One-to-many relationship
+}
+
+model Messages {
+  id         String   @id @default(uuid())
+  message    String
+  createdAt  DateTime @default(now())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id])
+  channelId  String
+  channel    Channel  @relation(fields: [channelId], references: [id]) // Add channel relationship
+}
+
+model Channel {
+  id             String         @id @default(uuid())
+  ownerId        String
+  createdAt      DateTime       @default(now())
+  user           User           @relation(fields: [ownerId], references: [id])
+  subscriptions   Subscriptions[] // One-to-many relationship
+  messages       Messages[]     // One-to-many relationship (if you want to track messages in a channel)
+}
+
+model Subscriptions {
+  id         String   @id @default(uuid())
+  channelId  String
+  userId     String
+  channel    Channel  @relation(fields: [channelId], references: [id])
+  user       User     @relation(fields: [userId], references: [id])
+}
