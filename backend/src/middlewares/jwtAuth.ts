@@ -3,9 +3,8 @@ import jwt from "jsonwebtoken";
 
 const secret = process.env.JWT_SECRET || 'random';
 
-export default function jwtVerify(req: Request, res: Response, next: NextFunction) {
-    // Extract token from the Authorization header
-    const token = req.header('Authorization')?.split(' ')[1]; // Get the token part after 'Bearer '
+export default function jwtAuth(req: Request, res: Response, next: NextFunction):any {
+    const token = req.headers.authorization
 
     if (!token) {
         return res.status(403).json({
@@ -14,13 +13,10 @@ export default function jwtVerify(req: Request, res: Response, next: NextFunctio
     }
     try {
        
-        const decoded = jwt.verify(token,secret)
-        req.user = decoded
-        if(!decoded) {
-            return res.status(401).json({
-                message: "Invalid token"
-            })
-        }
+        const payload = jwt.verify(token,secret)
+        console.log("decoded",payload);
+        // @ts-ignore
+        req.id = payload.id
         next()
 
     } catch (error) {

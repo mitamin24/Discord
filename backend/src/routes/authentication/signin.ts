@@ -1,10 +1,10 @@
-import express from "express";
+import express, { Request, Response } from "express"; // Import Request and Response types
 import cors from "cors";
-import { signinSchema } from "../zod/zod";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { signinSchema } from "../../zod/zod";
 
 dotenv.config();
 
@@ -19,8 +19,7 @@ if (!secret) {
 signinRouter.use(express.json());
 signinRouter.use(cors());
 
-// @ts-ignore
-signinRouter.post("/", async (req, res) => {
+signinRouter.post("/", async (req, res):Promise<any> => { // Explicitly type req and res
     const signinInput = signinSchema.safeParse(req.body);
     if (!signinInput.success) {
         return res.status(400).json({
@@ -52,7 +51,7 @@ signinRouter.post("/", async (req, res) => {
 
         const token = jwt.sign(
             {
-                userId: user.id,
+                id: user.id,
                 email: user.email,
             },
             secret,

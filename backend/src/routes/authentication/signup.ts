@@ -1,8 +1,8 @@
 import express, { Request, Response } from "express"; // Ensure proper imports
 import cors from "cors";
-import { signupSchema } from "../zod/zod";
 import bcrypt from "bcrypt";
 import { PrismaClient } from "@prisma/client";
+import { signupSchema } from "../../zod/zod";
 
 const prisma = new PrismaClient();
 
@@ -11,8 +11,7 @@ export const signupRouter = express.Router();
 signupRouter.use(express.json());
 signupRouter.use(cors());
 
-// @ts-ignore
-signupRouter.post("/", async (req: Request, res: Response) => { // Type annotations for req and res
+signupRouter.post("/", async (req, res):Promise<any> => { // Type annotations for req and res
     const signupInput = signupSchema.safeParse(req.body);
     
     if (!signupInput.success) {
