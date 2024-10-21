@@ -1,10 +1,11 @@
 import express, { Request, Response } from "express"; // Ensure proper imports
 import cors from "cors";
 import bcrypt from "bcrypt";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 import { signupSchema } from "../../zod/zod";
+import { prisma } from "../../db";
 
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 
 export const signupRouter = express.Router();
 

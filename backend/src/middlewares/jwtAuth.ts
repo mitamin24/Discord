@@ -14,7 +14,7 @@ export default function jwtAuth(req: Request, res: Response, next: NextFunction)
     try {
        
         const payload = jwt.verify(token,secret)
-        console.log("decoded",payload);
+        // console.log("payload",payload);
         // @ts-ignore
         req.id = payload.id
         next()

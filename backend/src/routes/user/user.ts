@@ -1,9 +1,10 @@
 import express from "express"
 import jwtAuth from "../../middlewares/jwtAuth"
-import { PrismaClient } from "@prisma/client"
+import { prisma } from "../../db"
+// import { PrismaClient } from "@prisma/client"
 
 export const userRouter = express.Router()
-const prisma =  new PrismaClient()
+// const prisma =  new PrismaClient()
 
 userRouter.get("/", jwtAuth, async (req,res):Promise<any> => {
     // @ts-ignore

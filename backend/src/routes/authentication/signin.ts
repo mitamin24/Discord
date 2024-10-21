@@ -1,15 +1,16 @@
 import express, { Request, Response } from "express"; // Import Request and Response types
 import cors from "cors";
-import { PrismaClient } from "@prisma/client";
+// import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { signinSchema } from "../../zod/zod";
+import { prisma } from "../../db";
 
 dotenv.config();
 
 export const signinRouter = express.Router();
-const prisma = new PrismaClient();
+// const prisma = new PrismaClient();
 const secret = process.env.JWT_SECRET || (process.env.NODE_ENV === 'development' ? 'secret' : undefined);
 
 if (!secret) {
