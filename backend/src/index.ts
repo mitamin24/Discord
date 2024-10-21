@@ -17,6 +17,7 @@ const PORT = process.env.PORT ;
 app.use(cors());
 app.use(express.json());
 app.use("/api/user",userRouter)
+app.use("/api/user/subscriptions")
 app.use("/api/user/messages",messageRouter)
 app.use("/api/user/channel",channelRouter)
 app.use("/api/auth/signup",signupRouter)
