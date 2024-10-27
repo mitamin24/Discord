@@ -3,7 +3,7 @@ import jwtAuth from "../../middlewares/jwtAuth"
 import { prisma } from "../../db"
 
 
-const subscriptionRouter = express.Router()
+export const subscriptionRouter = express.Router()
 
 subscriptionRouter.post("/",jwtAuth, async (req,res):Promise<any> => {
     const {channelId, userId} = req.body

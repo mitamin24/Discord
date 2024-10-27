@@ -40,6 +40,15 @@ model Channel {
   user           User           @relation(fields: [ownerId], references: [id])
   subscriptions   Subscriptions[] // One-to-many relationship
   messages       Messages[]     // One-to-many relationship (if you want to track messages in a channel)
+  rooms Rooms[]
+}
+
+model Rooms {
+  id String @id @default(uuid())
+  name String
+  channelId String
+  ownerId   String
+  channel Channel @relation(fields: [channelId], references: [id])
 }
 
 model Subscriptions {
