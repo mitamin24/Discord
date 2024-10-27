@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: discord-postgres
+    ports:
+      - '5432:5432'
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=luffy
+    volumes:
+      - discord_db:/var/lib/postgresql/data
+
+  backend:
+    container_name: discord_backend
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - '3001:3001'
+      - '5555:5555' # http://192.168.192.4:5555/ prisma studio url
+    environment:
+      - JWT_SECRET=onepiece
+      - PORT=3001
+      - DATABASE_URL=postgresql://postgres:luffy@discord-postgres:5432/postgres?schema=public
+    depends_on:
+      - postgres
+
+  ws:
+    container_name: discord_ws
+    build:
+      context: ./ws
+      dockerfile: Dockerfile
+    ports:
+      - '8080:8080'
+    depends_on:
+      - backend 
+      - redis 
+
+  redis:
+    image: redis:latest
+    container_name: discord-redis-server
+    ports:
+      - '6379:6379'
+    volumes:
+      - discord_redis_data:/data
+
+  frontend:
+    container_name: discord_frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - '5173:5173'
+    depends_on:
+      - backend
+
+volumes:
+  discord_db:
+  discord_redis_data:
