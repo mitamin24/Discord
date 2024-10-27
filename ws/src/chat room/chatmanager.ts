@@ -1,19 +1,27 @@
 import { createClient, RedisClientType } from "redis"
 import { WebSocket } from "ws"
 // @ts-ignore
-import {prisma} from "../../../backend/src/db"
+// import {prisma} from "../../../backend/src/db"
+import axios from "axios"
+
+// export const jwtToken = localStorage.getItem("token")
 
 export class ChatManager {
     private static instance: ChatManager
     private publishClient: RedisClientType
     private redisClient: RedisClientType
     private subscriptions: { [key: string]: { ws: WebSocket, channels: string[] } }
+    private static jwtToken: string;
 
     private constructor() {
-        this.redisClient = createClient()
-        this.redisClient.connect()
-        this.publishClient = createClient()
-        this.publishClient.connect()
+        this.redisClient = createClient({
+            url: 'redis://discord-redis-server:6379' // connect to redis using container name
+        })
+        this.redisClient.connect().catch(console.error);
+        this.publishClient = createClient({
+            url: 'redis://discord-redis-server:6379' // connect to redis using container name
+        })
+        this.publishClient.connect().catch(console.error);
         this.subscriptions = {}
     }
 
@@ -22,6 +30,7 @@ export class ChatManager {
             "user1" : {
             ws: websocket,
             channels: [movie,series]
+            .
             },
             "user2": {
             ws: websocket,
@@ -41,13 +50,17 @@ export class ChatManager {
         }    
         */
 
-
     public static getInstance(): ChatManager {
         if (!ChatManager.instance) {
             ChatManager.instance = new ChatManager()
         }
         return ChatManager.instance
     }
+
+    public static setJwtToken(token: string):void {
+        this.jwtToken = token
+    }
+        
 
     public addUser(userid:string, ws: WebSocket) {
         if(!this.subscriptions[userid]) {
@@ -109,12 +122,22 @@ export class ChatManager {
        
         try {
 
-            const subscribe = await prisma.subscriptions.create({
-                data: {
-                    channelId: channelId,
-                    userId: userId,
-                }
-            })
+            const response = await axios.post("http://localhost:3001/api/user/subscriptions",{
+                channelId,
+                userId
+            }, 
+        {
+            headers: {
+                'Authorization': `${ChatManager.jwtToken}`
+            }
+        })
+
+            // const subscribe = await prisma.subscriptions.create({
+            //     data: {
+            //         channelId: channelId,
+            //         userId: userId,
+            //     }
+            // })
 
             console.log(`Subscriptions data added to table`);
             
@@ -158,12 +181,23 @@ export class ChatManager {
         console.log(`Chuannels User :${userId} is subscribed to.`,this.subscriptions[userId].channels)
 
         try {
-            const unsubscribe = await prisma.subscriptions.deleteMany({
-                where: {
-                    userId: userId,
-                    channelId: channelId
-                },
-            })
+
+            const response = await axios.delete(`http://localhost:3001/api/user/subscriptions`, {
+                    data: { channelId }, // Send `channelId` in the `data` field
+                    headers: {
+                        Authorization: `Bearer ${ChatManager.jwtToken}`, // Add the JWT token in the Authorization header
+                       
+                    },
+                }
+            );
+            console.log("deleted!");
+            
+            // const unsubscribe = await prisma.subscriptions.deleteMany({
+            //     where: {
+            //         userId: userId,
+            //         channelId: channelId
+            //     },
+            // })
         } catch (error) {
             console.error("Error deleting subscription data from the database")
         }
@@ -207,13 +241,28 @@ export class ChatManager {
         console.log(`Broadcast message to websocket clients in channel ${channelId}: ${message}`);
 
         try {
-            const msg = await prisma.messages.create({
-                data: {
-                    message: message,
-                    userId: userId,
-                    channelId: channelId
+
+            const response = await axios.post("http://localhost:3001/api/user/messages",{
+                userId,
+                channelId,
+                message
+            },
+            {
+                headers: {
+                    Authorization: ChatManager.jwtToken
                 }
-            })
+            }
+        )
+        console.log("message created");
+        
+
+            // const msg = await prisma.messages.create({
+            //     data: {
+            //         message: message,
+            //         userId: userId,
+            //         channelId: channelId
+            //     }
+            // })
         } catch (error) {
             console.error("Error storing msg in database table")        
         }
