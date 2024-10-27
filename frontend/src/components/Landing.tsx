@@ -1,15 +1,18 @@
-const Landing = () => {
-    return (
-      <div 
-        className="h-screen flex items-center justify-center text-white text-3xl font-semibold" 
-        style={{
-          background: "linear-gradient(0.3deg, rgb(20, 121, 189) 0.9%, rgb(36, 36, 204) 88.6%)"
-        }}
-      >
-        Hi there!
-      </div>
-    );
-  }
-  
-  export default Landing;
-  
+'use client';
+
+
+
+const SignUp = () => {
+  return (
+    <div
+      className="min-h-screen flex items-center justify-center text-white"
+      style={{
+        background: "linear-gradient(145deg, #000000 30%, #130F40 100%)",
+      }}
+    >
+      
+    </div>
+  );
+};
+
+export default SignUp;
